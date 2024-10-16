@@ -1,0 +1,46 @@
+﻿  engineImplementGL.cpp
+C:\Users\0x55\source\repos\PotentEngine\vendor\include\glad\gl.h(5470,5): warning C4551: wywołaniu funkcji brakuje listy argumentów
+  (kompilowanie pliku źródłowego „src/Core/engineImplementGL.cpp”)
+  
+  run.cpp
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineMesh.h(51,53): warning C4267: "inicjowanie": konwersja z "size_t" do "uint32_t", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineMesh.h(51,41): warning C4267: "inicjowanie": konwersja z "size_t" do "const uint32_t", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineMesh.h(176,57): warning C4267: "inicjowanie": konwersja z "size_t" do "uint32_t", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineMesh.h(176,40): warning C4267: "inicjowanie": konwersja z "size_t" do "const uint32_t", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineMesh.h(365,22): warning C4244: "inicjowanie": konwersja z "std::streamoff" do "uint32_t", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(30,51): warning C4244: "return": konwersja z "double" do "potent::real", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(31,51): warning C4244: "return": konwersja z "double" do "potent::real", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(77,45): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineCamera.h(29,15): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineCamera.h(30,15): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineCamera.h(32,16): warning C4244: "=": konwersja z "double" do "int", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineCamera.h(33,16): warning C4244: "=": konwersja z "double" do "int", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+  Trwa generowanie kodu
+  Previous IPDB not found, fall back to full compilation.
+  All 919 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Zakończono generowanie kodu
+  PotentEngine.vcxproj -> C:\Users\0x55\source\repos\PotentEngine\Release_x64\PotentEngine_x64.exe
