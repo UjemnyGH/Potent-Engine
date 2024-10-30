@@ -3,9 +3,10 @@
 #define _POTENT_ENGINE_PARTICLE_
 
 #include "../Core/engineMath.h"
+#include "../Scene/engineComponent.h"
 
 namespace potent {
-	class Particle {
+	class Particle : public Component {
 	public:
 		RVec position = RVec();
 		RVec lastPosition = RVec();
@@ -14,6 +15,11 @@ namespace potent {
 		RVec accumulatedForce = RVec();
 		real inverseMass = 1.0f;
 		real damping = 0.995f;
+
+		Particle() {
+			mComponentId = Component_Particle;
+			componentName = "default_particle";
+		}
 
 		void updateParticle(real dt) {
 			if (dt <= 0.0f) { return; }

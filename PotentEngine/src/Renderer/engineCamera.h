@@ -4,10 +4,11 @@
 
 #include "../Core/engineMath.h"
 #include "../Core/engineCore.h"
+#include "../Scene/engineComponent.h"
 #include <algorithm>
 
 namespace potent {
-	class Camera {
+	class Camera : public Component {
 	private:
 		RMat mViewMatrix = RMat::Identity();
 		RMat mProjectionMatrix = RMat::Identity();
@@ -21,6 +22,11 @@ namespace potent {
 		real fieldOfView = 90.0f;
 		real zNear = 0.001f;
 		real zFar = 100.0f;
+
+		Camera() { 
+			mComponentId = Component_Camera; 
+			componentName = "default_camera";
+		}
 
 		RMat getViewMatrix() { return mViewMatrix; }
 		RMat getProjectionMatrix() { return mProjectionMatrix; }

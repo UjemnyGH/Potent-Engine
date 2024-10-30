@@ -12,14 +12,25 @@ namespace potent {
 		GLFWwindow* mWindowPtr;
 
 	public:
-		double mouseX, mouseY;
-		int windowWidth, windowHeight;
-		double engineTime, engineDeltaTime, engineLastTime;
+		static Window* instance;
+		static double mouseX, mouseY;
+		static int windowWidth, windowHeight;
+		static double engineTime, engineDeltaTime, engineLastTime;
 
 		virtual void awake() {}
 		virtual void start() {}
 		virtual void update() {}
 		virtual void lateUpdate() {}
+
+		Window() {
+			if (Window::instance) {
+				ENGINE_WARN("Window static instance already exist @ " << Window::instance << ", exiting from setting new one!");
+
+				return;
+			}
+
+			Window::instance = this;
+		}
 
 		GLFWwindow* getPtr() { return mWindowPtr; }
 
@@ -39,7 +50,7 @@ namespace potent {
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-			glfwWindowHint(GLFW_SAMPLES, 4);
+			glfwWindowHint(GLFW_SAMPLES, 16);
 
 			mWindowPtr = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
@@ -74,6 +85,10 @@ namespace potent {
 				glfwGetCursorPos(mWindowPtr, &mouseX, &mouseY);
 				glfwGetWindowSize(mWindowPtr, &windowWidth, &windowHeight);
 
+				glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+				glClear(0x4100);
+
 				update();
 				
 				glfwSwapBuffers(mWindowPtr);
@@ -81,15 +96,23 @@ namespace potent {
 				lateUpdate();
 
 				glfwPollEvents();
-
-				glClear(0x4100);
-
-				glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			}
 
 			glfwTerminate();
 		}
 	};
+
+	Window* Window::instance = nullptr;
+
+	double Window::mouseX = 0.0;
+	double Window::mouseY = 0.0;
+
+	int Window::windowWidth = 0;
+	int Window::windowHeight = 0;
+
+	double Window::engineTime = 0.0;
+	double Window::engineDeltaTime = 0.0;
+	double Window::engineLastTime = 0.0f;
 }
 
 #endif

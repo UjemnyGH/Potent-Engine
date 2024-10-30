@@ -4,6 +4,8 @@
 #include "Renderer/engineCamera.h"
 #include "Physics/engineParticle.h"
 #include "Physics/engineCollisions.h"
+#include "Scene/engineScene.h"
+#include "Scene/engineLights.h"
 #include <thread>
 
 class SmartRender {
@@ -11,7 +13,12 @@ private:
 	std::vector<potent::Renderer> mRendereres;
 };
 
-class Wnd : public potent::Window {
+int resolutionScale = 1;
+int colorScale = 128;
+
+const int G_PHYSICS_SPEED = 32;
+
+class MainScene : public potent::Scene {
 private:
 	potent::Renderer renderer;
 	std::vector<potent::RenderObjectData> models;
@@ -31,43 +38,21 @@ private:
 	potent::Texture snow;
 
 	int frameCounter100 = 0;
-	const int physicsSpeed = 32;
+	bool physicsModelsExist = false;
+	potent::Light light;
 
 public:
-	void physicsThread() {
-		for (std::size_t i = 0; i < models[1].meshData.vertices.size() / 9; i++) {
-			potent::real* dataPtr = &models[1].meshData.vertices[i * 9];
-
-			potent::RVec a = models[1].transform.GetTransform() * potent::RVec(dataPtr[0], dataPtr[1], dataPtr[2]);
-			potent::RVec b = models[1].transform.GetTransform() * potent::RVec(dataPtr[3], dataPtr[4], dataPtr[5]);
-			potent::RVec c = models[1].transform.GetTransform() * potent::RVec(dataPtr[6], dataPtr[7], dataPtr[8]);
-
-			potent::RVec point = potent::pointOnPlane(player.position, a, b, c);
-
-			if (point.w != 1.0f) {
-				potent::AABox playerBox;
-				playerBox.position = player.position;
-				playerBox.size = potent::RVec(0.5f, 2.0f, 0.5f);
-
-				if (potent::pointBoxCollision(playerBox, point)) {
-					potent::RVec collisionNormal = potent::RVec::PlaneNormal(a, b, c);
-					potent::resolveCollision(1.0 / (double)physicsSpeed, collisionNormal, &player);
-					potent::resolvePenetration(1.0 / (double)physicsSpeed, point.Distance(player.position), collisionNormal, &player);
-				}
-			}
-		}
-		
-		//player.addForce(potent::RVec(0.0f, -9.8f, 0.0f));
-
-		player.updateParticle(1.0 / (double)physicsSpeed);
+	MainScene() : Scene() {
+		name = "MainScene";
 	}
 
 	virtual void awake() override {
-		printf("Awake\n");
+		ENGINE_INFO("Awake scene " << name);
 	}
 
 	virtual void start() override {
-		printf("Start\n");
+		ENGINE_INFO("Started scene " << name);
+
 		camera.zFar = 100.0f;
 
 		vs.loadFromFile("assets/shaders/texture.vert", GL_VERTEX_SHADER);
@@ -77,16 +62,16 @@ public:
 		renderer.attachShader(&fs);
 		renderer.relinkShaderProgram();
 
-		renderer.useMaxTexture();
+		renderer.useMaxTextureArray();
 
 		std::uint32_t textureWidth, textureHeight;
 		std::vector<std::uint8_t> pixels = potent::loadImageData("assets/textures/ph_skybox.png", &textureWidth, &textureHeight);
 
-		skybox.textureBuffer.bindData(pixels, textureWidth, textureHeight);
+		skybox.textureArrayBuffer.bindData(pixels, textureWidth, textureHeight);
 		skybox.name = "SKYBOX_TEXTURE";
 
 		pixels = potent::loadImageData("assets/textures/ph_snow256x256.png", &textureWidth, &textureHeight);
-		snow.textureBuffer.bindData(pixels, textureWidth, textureHeight);
+		snow.textureArrayBuffer.bindData(pixels, textureWidth, textureHeight);
 		snow.name = "SNOW256";
 
 		models.push_back(potent::RenderObjectData());
@@ -96,9 +81,9 @@ public:
 		std::fill(models[0].textureId.begin(), models[0].textureId.end(), 0.0f);
 
 		models.push_back(potent::RenderObjectData());
-		models[1].makeModel(potent::loadPLYMesh("assets/models/ph_map1.ply"));
+		models[1].makeModel(potent::loadPLYMesh("assets/models/ph_map2.ply"));
 		models[1].name = "MAP1";
-		models[1].transform.SetScale(potent::RVec(10.0f));
+		models[1].transform.SetScale(potent::RVec(100.0f));
 		models[1].transform.SetRotation(potent::RVec(potent::ToRadians(90.0f), 0.0f));
 		std::fill(models[1].textureId.begin(), models[1].textureId.end(), 0.0f);
 
@@ -113,16 +98,17 @@ public:
 		renderDatas[0].joinAndBindData();
 		renderDatas[1].joinAndBindData();
 
-		glfwSwapInterval(1);
+		physicsModelsExist = true;
 	}
 
-	virtual void update() override {		
-		glViewport(0, 0, windowWidth, windowHeight);
-		//projection = potent::RMat::OrthograpicSymmertical(2.0f, 2.0f, 0.01f, 100.0f);
+	virtual void update() override {
+		light.lightingData.direction = potent::RVec(0.1f, -0.8f, 0.1f).Normalize();
+		light.lightingData.ambient = potent::RVec(0.3f);
+		light.lightingData.diffuse = potent::RVec(1.0f);
+		light.lightingData.specular = potent::RVec(0.1f);
+		light.lightingData.lightType = DIRECTIONAL_LIGHT;
 
 		models[0].transform.SetPosition(camera.position);
-
-		//models[0].transform.SetRotation(potent::RVec(potent::ToRadians(180.0f * sin(engineTime)), 0.0f));
 
 		renderDatas[0].joinAndBindData();
 
@@ -135,118 +121,205 @@ public:
 		if (frameCounter100 > 100) {
 			frameCounter100 = 0;
 
-			ENGINE_INFO("FPS: " << 1.0 / engineDeltaTime);
+			ENGINE_INFO("FPS: " << 1.0 / potent::Window::engineDeltaTime);
 		}
 
-		potent::debugDrawModel(&models[1], camera.getProjectionMatrix(), camera.getViewMatrix());
+		//potent::debugDrawModel(&models[1], camera.getProjectionMatrix(), camera.getViewMatrix());
 
-		for (std::size_t i = 0; i < models[1].meshData.vertices.size() / 9; i++) {
-			potent::real* dataPtr = &models[1].meshData.vertices[i * 9];
+		glViewport(0, 0, potent::Window::windowWidth, potent::Window::windowHeight);
 
-			potent::RVec a = models[1].transform.GetTransform() * potent::RVec(dataPtr[0], dataPtr[1], dataPtr[2]);
-			potent::RVec b = models[1].transform.GetTransform() * potent::RVec(dataPtr[3], dataPtr[4], dataPtr[5]);
-			potent::RVec c = models[1].transform.GetTransform() * potent::RVec(dataPtr[6], dataPtr[7], dataPtr[8]);
+		potent::GLOBAL_SCENE_HANDLER.getPostProcessingSquareRenderDataPointer()->vertexArray.bind();
 
-			potent::RVec point = potent::pointOnPlane(player.position /* - potent::RVec(0.4f, 1.0f, 0.4f)*/, a, b, c);
-			//potent::RVec point2 = potent::pointOnPlane(player.position + potent::RVec(0.4f, 1.0f, 0.4f), a, b, c);
+		getShaderLightStorage()->bindData((void*) & light.lightingData, sizeof(potent::LightingData), 1);
 
-			if (point.w != 1.0f) {// || point2.w != 1.0f) {
-				potent::AABox playerBox;
-				playerBox.position = player.position;
-				playerBox.size = potent::RVec(0.4f, 1.0f, 0.4f);
+		potent::GLOBAL_SCENE_HANDLER.getPostProcessingSquareRenderDataPointer()->vertexArray.unbind();
 
-				potent::RVec usedPoint = point;
+		potent::GLOBAL_SCENE_HANDLER.getPostProcessingRendererPointer()->operator()()->use();
 
-				glPointSize(16.0f);
-				potent::debugDrawPoint(usedPoint, camera.getProjectionMatrix(), camera.getViewMatrix());
-				glPointSize(1.0f);
+		glUniform1i(glGetUniformLocation(potent::GLOBAL_SCENE_HANDLER.getPostProcessingRendererPointer()->operator()()->id, "modifier"), colorScale);
+		glUniform4f(glGetUniformLocation(potent::GLOBAL_SCENE_HANDLER.getPostProcessingRendererPointer()->operator()()->id, "uViewPosition"), camera.position.x, camera.position.y, camera.position.z, 0.0f);
 
-				/*if (point.Distance(player.position - potent::RVec(0.4f, 1.0f, 0.4f)) > point2.Distance(player.position - potent::RVec(0.4f, 1.0f, 0.4f))) {
-					usedPoint = point2;
-				}*/
-
-				if (potent::pointBoxCollision(playerBox, usedPoint)) {
-					potent::RVec collisionNormal = potent::RVec::PlaneNormal(a, b, c).Negate();
-					potent::resolveCollision(engineDeltaTime, collisionNormal, &player);
-					potent::resolvePenetration(engineDeltaTime, point.Distance(player.position - (collisionNormal * playerBox.size) + (player.velocity * collisionNormal * engineDeltaTime)), collisionNormal, &player);
-				}
-				else if (potent::lineTriangleIntersectionPoint(player.lastPosition, player.velocity.Normalize(), a, b, c).Distance(player.lastPosition) <= player.lastPosition.Distance(player.position)) {
-					potent::RVec collisionNormal = potent::RVec::PlaneNormal(a, b, c).Negate();
-					potent::resolveCollision(engineDeltaTime, collisionNormal, &player);
-					potent::resolvePenetration(engineDeltaTime, point.Distance(player.position - (collisionNormal * playerBox.size) + (player.velocity * collisionNormal * engineDeltaTime)), collisionNormal, &player);
-				}
-			}
-		}
+		potent::GLOBAL_SCENE_HANDLER.getPostProcessingRendererPointer()->operator()()->unuse();
 	}
 
 	virtual void lateUpdate() override {
-		//std::jthread physics(&Wnd::physicsThread, this);
-		//physics.detach();
 
-		player.addForce(potent::RVec(0.0f, -98.0f, 0.0f));
+		const potent::real playerSpeed = 10.0f;
 
-		player.updateParticle(engineDeltaTime);
-
-		const potent::real playerSpeed = 100.0f;
-
-		if (getKey(GLFW_KEY_ESCAPE) && !escapePressed) {
+		if (potent::Window::instance->getKey(GLFW_KEY_ESCAPE) && !escapePressed) {
 			escapePressed = true;
 			cameraLock = !cameraLock;
 		}
-		else if (!getKey(GLFW_KEY_ESCAPE) && escapePressed) {
+		else if (!potent::Window::instance->getKey(GLFW_KEY_ESCAPE) && escapePressed) {
 			escapePressed = false;
 		}
 
-		if (getKey(GLFW_KEY_F1) && !f1Pressed) {
+		if (potent::Window::instance->getKey(GLFW_KEY_F1) && !f1Pressed) {
 			f1Pressed = true;
 			projectionOrtho = !projectionOrtho;
 		}
-		else if (!getKey(GLFW_KEY_F1) && f1Pressed) {
+		else if (!potent::Window::instance->getKey(GLFW_KEY_F1) && f1Pressed) {
 			f1Pressed = false;
 		}
 
-		if (getKey('W')) {
+		if (potent::Window::instance->getKey('W')) {
 			player.addForce(camera.front * playerSpeed);
 		}
-		else if (getKey('S')) {
+		else if (potent::Window::instance->getKey('S')) {
 			player.addForce(camera.front.Negate() * playerSpeed);
 		}
 
-		if (getKey('A')) {
+		if (potent::Window::instance->getKey('A')) {
 			player.addForce(camera.right.Negate() * playerSpeed);
 		}
-		else if (getKey('D')) {
+		else if (potent::Window::instance->getKey('D')) {
 			player.addForce(camera.right * playerSpeed);
 		}
 
-		if (getKey(' ')) {
-			player.addForce(potent::RVec(0.0f, 500.0f));
+		if (potent::Window::instance->getKey(' ')) {
+			player.addForce(potent::RVec(0.0f, 50.0f));
 		}
 
 		camera.position = player.position + potent::RVec(0.0f, 0.8f, 0.0f);
 
 		if (cameraLock) {
-			disableCursor();
+			potent::Window::instance->disableCursor();
 
-			camera.cameraViewMatrix(mouseX, mouseY);
+			camera.cameraViewMatrix(potent::Window::mouseX, potent::Window::mouseY);
 		}
 		else {
-			enableCursor();
+			potent::Window::instance->enableCursor();
 		}
 
 		camera.updateViewMatrix();
 
 		if (projectionOrtho) {
-			camera.cameraProjectionOrthographic(windowWidth, windowHeight);
+			camera.cameraProjectionOrthographic(potent::Window::windowWidth, potent::Window::windowHeight);
 		}
 		else {
-			camera.cameraProjectionPerspective(windowWidth, windowHeight);
+			camera.cameraProjectionPerspective(potent::Window::windowWidth, potent::Window::windowHeight);
 		}
+	}
+
+	virtual void fixedUpdate() override {
+		if (physicsModelsExist) {
+			potent::RVec closestPoint = potent::RVec(models[1].meshData.vertices[0], models[1].meshData.vertices[1], models[1].meshData.vertices[2]);
+
+			for (std::size_t i = 0; i < models[1].meshData.vertices.size() / 9; i++) {
+				potent::real* dataPtr = &models[1].meshData.vertices[i * 9];
+
+				potent::RVec a = models[1].transform.GetTransform() * potent::RVec(dataPtr[0], dataPtr[1], dataPtr[2]);
+
+				if (player.position.Distance(a) > player.position.Distance(closestPoint)) {
+					continue;
+				}
+
+				closestPoint = a;
+
+				potent::RVec b = models[1].transform.GetTransform() * potent::RVec(dataPtr[3], dataPtr[4], dataPtr[5]);
+				potent::RVec c = models[1].transform.GetTransform() * potent::RVec(dataPtr[6], dataPtr[7], dataPtr[8]);
+
+				potent::RVec point = potent::pointOnPlane(player.position, a, b, c);
+
+				if (point.w != 1.0f) {
+					potent::AABox playerBox;
+					playerBox.position = player.position;
+					playerBox.size = potent::RVec(0.4f, 1.0f, 0.4f);
+
+					potent::RVec usedPoint = point;
+
+					if (potent::pointBoxCollision(playerBox, usedPoint) || potent::lineTriangleIntersectionPoint(player.lastPosition, player.velocity.Normalize(), a, b, c).Distance(player.lastPosition) <= player.lastPosition.Distance(player.position)) {
+						potent::RVec collisionNormal = potent::RVec::PlaneNormal(a, b, c).Negate();
+						potent::resolveCollision(1.0 / (double)G_PHYSICS_SPEED, collisionNormal, &player);
+						potent::resolvePenetration(1.0 / (double)G_PHYSICS_SPEED, point.Distance(player.position - (collisionNormal * playerBox.size) + (player.velocity * collisionNormal * (1.0 / (double)G_PHYSICS_SPEED))), collisionNormal, &player);
+					
+						break;
+					}
+				}
+			}
+		}
+
+		player.addForce(potent::RVec(0.0f, -9.8f, 0.0f));
+
+		player.updateParticle(1.0 / (double)G_PHYSICS_SPEED);
+	}
+} GLOBAL_MAIN_SCENE;
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	/*if (yoffset < 0.0 && resolutionScale > 1) {
+		resolutionScale--;
+	}
+
+	if (yoffset > 0.0 && resolutionScale < 0x1000) {
+		resolutionScale++;
+	}*/
+
+	if (yoffset < 0.0 && colorScale > 1) {
+		colorScale--;
+	}
+
+	if (yoffset > 0.0 && colorScale < 0x100) {
+		colorScale++;
+	}
+}
+
+class Wnd : public potent::Window {
+private:
+	potent::Shader postProcessLightVertexShader, postProcessLightFragmentShader;
+
+	const int physicsSpeed = G_PHYSICS_SPEED;
+
+	std::jthread physicsThread;
+
+public:
+	void physicsUpdate() {
+		while (1) {
+			std::chrono::time_point start = std::chrono::high_resolution_clock::now();
+
+			potent::GLOBAL_SCENE_HANDLER.fixedUpdateCurrent();
+
+			while (std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start).count() < 1.0 / (double)physicsSpeed) continue;
+		}
+	}
+
+	virtual void awake() override {
+		printf("Awake\n");
+
+		potent::GLOBAL_SCENE_HANDLER.awakeCurrent();
+	}
+
+	virtual void start() override {
+		printf("Start\n");
+
+		glfwSetScrollCallback(getPtr(), scroll_callback);
+
+		potent::GLOBAL_SCENE_HANDLER.startCurrent();
+
+		postProcessLightVertexShader.loadFromFile("assets/shaders/post_light.vert", GL_VERTEX_SHADER);
+		postProcessLightFragmentShader.loadFromFile("assets/shaders/post_light.frag", GL_FRAGMENT_SHADER);
+
+		physicsThread = std::jthread(&Wnd::physicsUpdate, this);
+		physicsThread.detach();
+
+		glfwSwapInterval(0);
+	}
+
+	virtual void update() override {		
+		glViewport(0, 0, windowWidth / resolutionScale, windowHeight / resolutionScale);
+
+		potent::GLOBAL_SCENE_HANDLER.updateCurrent(windowWidth / resolutionScale, windowHeight / resolutionScale, &postProcessLightVertexShader, &postProcessLightFragmentShader);
+	}
+
+	virtual void lateUpdate() override {
+		potent::GLOBAL_SCENE_HANDLER.lateUpdateCurrent();
 	}
 
 } wnd;
 
 int main(int argv, char** argc) {
+	potent::GLOBAL_SCENE_HANDLER.attachScene(&GLOBAL_MAIN_SCENE);
+	potent::GLOBAL_SCENE_HANDLER.switchScene("MainScene");
+
 	wnd.run(800, 600, "Window");
 
 	return 0;

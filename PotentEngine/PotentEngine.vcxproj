@@ -30,12 +30,18 @@
     <ClInclude Include="src\Renderer\engineMesh.h" />
     <ClInclude Include="src\Renderer\engineRendererData.h" />
     <ClInclude Include="src\Renderer\engineRenderer.h" />
+    <ClInclude Include="src\Scene\engineComponent.h" />
+    <ClInclude Include="src\Scene\engineComponentIds.h" />
+    <ClInclude Include="src\Scene\engineLights.h" />
+    <ClInclude Include="src\Scene\engineScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\engineImplementGL.cpp" />
     <ClCompile Include="src\run.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\shaders\post_light.frag" />
+    <None Include="assets\shaders\post_light.vert" />
     <None Include="assets\shaders\texture.frag" />
     <None Include="assets\shaders\texture.vert" />
   </ItemGroup>

@@ -13,11 +13,15 @@ layout(location = 4) in float iTexId;
 out vec4 vCol;
 out vec2 vTexC;
 out float vTexId;
+out vec3 vNor;
+out vec4 vPos;
 
 void main() {
-	gl_Position = uProjection * uView * uTransform * iPos;
-
 	vCol = iCol;
 	vTexC = iTexC;
 	vTexId = iTexId;
+	vNor = transpose(inverse(mat3(uTransform))) * iNor;
+	vPos = uTransform * iPos;
+
+	gl_Position = uProjection * uView * uTransform * iPos;
 }

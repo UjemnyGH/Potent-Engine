@@ -12,6 +12,10 @@
     <ClInclude Include="src\Renderer\engineCamera.h" />
     <ClInclude Include="src\Physics\engineCollisions.h" />
     <ClInclude Include="src\Physics\engineParticle.h" />
+    <ClInclude Include="src\Scene\engineScene.h" />
+    <ClInclude Include="src\Scene\engineComponent.h" />
+    <ClInclude Include="src\Scene\engineComponentIds.h" />
+    <ClInclude Include="src\Scene\engineLights.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\run.cpp" />
@@ -20,5 +24,7 @@
   <ItemGroup>
     <None Include="assets\shaders\texture.vert" />
     <None Include="assets\shaders\texture.frag" />
+    <None Include="assets\shaders\post_light.vert" />
+    <None Include="assets\shaders\post_light.frag" />
   </ItemGroup>
 </Project>

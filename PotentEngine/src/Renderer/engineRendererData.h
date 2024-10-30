@@ -5,21 +5,35 @@
 #include "engineMesh.h"
 #include "../Core/engineMath.h"
 #include "../Core/engineBuffers.h"
+#include "../Scene/engineComponent.h"
 #include <array>
 
 namespace potent {
 	struct Texture {
 		TextureBuffer textureBuffer;
+		TextureArrayBuffer textureArrayBuffer;
 		std::string name;
 	};
 
-	struct RenderObjectData {
+	class RenderObjectData : public Component {
+	public:
 		// Unoptimized but effective way of searching models
 		std::string name;
 		Transform transform;
 		MeshRawData meshData;
 		std::vector<float> colors;
 		std::vector<float> textureId;
+
+		RenderObjectData() {
+			mComponentId = Component_Mesh;
+			componentName = "default_mesh";
+		}
+
+		RenderObjectData(MeshRawData mesh) {
+			mComponentId = Component_Mesh;
+			componentName = "default_mesh";
+			makeModel(mesh);
+		}
 
 		void makeModel(MeshRawData mesh) {
 			meshData = mesh;
@@ -47,23 +61,29 @@ namespace potent {
 
 		std::array<Texture*, 32> texturesPtr;
 
+		bool rejoinedDataBound = false;
+
 		void bindData() {
-			vertexArray.bind();
+			if (!rejoinedDataBound) {
+				vertexArray.bind();
 
-			// Vertices at location 0
-			vertexBuffer.bindPlace(3, 0, 3 * sizeof(joinedData[0]), verticesOffset				* sizeof(joinedData[0]));
-			// Normals at location 1
-			vertexBuffer.bindPlace(3, 1, 3 * sizeof(joinedData[0]), normalsOffset				* sizeof(joinedData[0]));
-			// Texture coordinates at location 2
-			vertexBuffer.bindPlace(2, 2, 2 * sizeof(joinedData[0]), textureCoordinatesOffset	* sizeof(joinedData[0]));
-			// Colors at location 3
-			vertexBuffer.bindPlace(4, 3, 4 * sizeof(joinedData[0]), colorsOffset				* sizeof(joinedData[0]));
-			// Texture ids at location 4
-			vertexBuffer.bindPlace(1, 4, 1 * sizeof(joinedData[0]), textureIdOffset				* sizeof(joinedData[0]));
+				// Vertices at location 0
+				vertexBuffer.bindPlace(3, 0, 3 * sizeof(joinedData[0]), verticesOffset				* sizeof(joinedData[0]));
+				// Normals at location 1
+				vertexBuffer.bindPlace(3, 1, 3 * sizeof(joinedData[0]), normalsOffset				* sizeof(joinedData[0]));
+				// Texture coordinates at location 2
+				vertexBuffer.bindPlace(2, 2, 2 * sizeof(joinedData[0]), textureCoordinatesOffset	* sizeof(joinedData[0]));
+				// Colors at location 3
+				vertexBuffer.bindPlace(4, 3, 4 * sizeof(joinedData[0]), colorsOffset				* sizeof(joinedData[0]));
+				// Texture ids at location 4
+				vertexBuffer.bindPlace(1, 4, 1 * sizeof(joinedData[0]), textureIdOffset				* sizeof(joinedData[0]));
 
-			vertexBuffer.bindData(joinedData);
+				vertexBuffer.bindData(joinedData);
 
-			vertexArray.unbind();
+				vertexArray.unbind();
+
+				rejoinedDataBound = true;
+			}
 		}
 
 		void joinData() {
@@ -100,6 +120,8 @@ namespace potent {
 
 			textureIdOffset = joinedData.size();
 			std::copy(textureIdTemp.begin(), textureIdTemp.end(), std::back_inserter(joinedData));
+			
+			rejoinedDataBound = false;
 		}
 
 		void joinAndBindData() {

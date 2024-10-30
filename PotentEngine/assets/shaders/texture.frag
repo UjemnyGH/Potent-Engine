@@ -1,12 +1,16 @@
 #version 450 core
 
-uniform sampler2D uTexture[32];
+layout(location = 0) out vec4 oPos;
+layout(location = 1) out vec4 oNor;
+layout(location = 2) out vec4 oAlbedo;
+
+uniform sampler2DArray uTextureArray[32];
 
 in vec4 vCol;
 in vec2 vTexC;
 in float vTexId;
-
-out vec4 oCol;
+in vec3 vNor;
+in vec4 vPos;
 
 void main() {
 	int texId = int(vTexId);
@@ -14,12 +18,20 @@ void main() {
 	vec4 result = vec4(1.0, 1.0, 1.0, 1.0);
 
 	if(texId < 32) {
-		result = texture(uTexture[texId], vTexC);
+		result = texture(uTextureArray[texId], vec3(vTexC.xy, 0.0));
 	}
 
 	result = result * vCol;
 
-	if(result.w < 0.1) discard;
+	oAlbedo.rgb = vec3(result.rgb);
 
-	oCol = result;
+	if(texId < 32) {
+		oAlbedo.a = texture(uTextureArray[texId], vec3(vTexC.xy, 0.0)).a;
+	}
+	else {
+		oAlbedo.a = 0.1f;
+	}
+
+	oPos = vPos;
+	oNor = vec4(normalize(vNor), 1.0);
 }

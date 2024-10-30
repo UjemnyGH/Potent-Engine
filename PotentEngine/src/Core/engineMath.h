@@ -901,7 +901,7 @@ namespace potent {
          *
          */
         void __RecalculateMatrix() {
-            mTransformMatrix = Matrix4<real>::Scale(mScale) * Matrix4<real>::Translate(mPosition) * Matrix4<real>::RotateX(mRotation.x) * Matrix4<real>::RotateY(mRotation.y) * Matrix4<real>::RotateZ(mRotation.z);
+            mTransformMatrix = Matrix4<real>::Scale(mScale) * Matrix4<real>::RotateX(mRotation.x) * Matrix4<real>::RotateY(mRotation.y) * Matrix4<real>::RotateZ(mRotation.z) * Matrix4<real>::Translate(mPosition);
         }
 
     public:
@@ -910,6 +910,8 @@ namespace potent {
 
             __RecalculateMatrix();
         }
+
+        Matrix4<real>* operator()() { return &mTransformMatrix; }
 
         /**
          * @brief Set the Position

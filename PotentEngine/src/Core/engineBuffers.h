@@ -52,6 +52,8 @@ namespace potent {
 
 			file.close();
 
+            ENGINE_INFO("Loading " << filePath << " shader!");
+
 			loadFromMemory(sourceBuffer.c_str(), type);
 		}
 
@@ -330,6 +332,16 @@ namespace potent {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
+        void getData(int width, int height, int type, int internalFormat, int format, int tid, int attachment, int filter = GL_NEAREST) {
+            glBindTexture(GL_TEXTURE_2D, tid);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, nullptr);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, tid, 0);
+        }
+
         void getTextureFromFrameDepthStencil(int width, int height) {
             bind();
 
@@ -339,7 +351,7 @@ namespace potent {
                 texCreated = true;
             }
 
-            glBindTexture(GL_TEXTURE_2D, texCreated);
+            glBindTexture(GL_TEXTURE_2D, textureId);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 
@@ -433,18 +445,94 @@ namespace potent {
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
         }
 
-        void createStorage(Framebuffer fb, int width, int height) {
+        void createStorage(Framebuffer* pFb, int width, int height) {
             bind();
 
-            fb.bind();
+            pFb->bind();
 
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, id);
 
-            fb.getTextureFromFrameColor(width, height);
+            pFb->getTextureFromFrameColor(width, height);
 
-            fb.unbind();
+            pFb->unbind();
             unbind();
+        }
+    };
+
+    struct GeometryBuffer {
+        Framebuffer graphicsBuffer;
+        Renderbuffer renderBuffer;
+        TextureBuffer textures[32];
+        const std::uint32_t USED_TEXTURES = 3;
+
+        void initGraphicsBuffer(int width, int height) {
+            graphicsBuffer.bind();
+            for (std::uint32_t i = 0; i < USED_TEXTURES; i++) {
+                textures[i].init();
+            }
+
+            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA16F, GL_RGBA, textures[0].id, GL_COLOR_ATTACHMENT0);
+            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA16F, GL_RGBA, textures[1].id, GL_COLOR_ATTACHMENT1);
+            graphicsBuffer.getData(width, height, GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA, textures[2].id, GL_COLOR_ATTACHMENT2);
+
+            unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+            glDrawBuffers(USED_TEXTURES, attachments);
+
+            renderBuffer.bind();
+
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer.id);
+
+            graphicsBuffer.unbind();
+        }
+
+        void startGraphicsBuffer() {
+            graphicsBuffer.bind();
+        }
+
+        void endGraphicsBuffer() {
+            graphicsBuffer.unbind();
+        }
+    };
+
+    struct ShaderStorageBuffer {
+        std::uint32_t id;
+        bool created = false;
+
+        void init() {
+            if (!created) {
+                glGenBuffers(1, &id);
+
+                created = true;
+            }
+        }
+
+        void bind() {
+            init();
+
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, id);
+        }
+
+        void unbind() {
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        }
+
+        void bindData(void* data, std::size_t size, std::uint32_t bindingBase = 1) {
+            bind();
+
+            glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_DRAW);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingBase, id);
+
+            unbind();
+        }
+
+        ~ShaderStorageBuffer() {
+            if (created) {
+                glDeleteBuffers(1, &id);
+
+                created = false;
+            }
         }
     };
 }

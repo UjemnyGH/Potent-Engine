@@ -24,6 +24,7 @@ namespace potent {
 	private:
 		ShaderProgram mShaderProgram;
 		std::vector<Shader*> mShaders;
+		bool mUseTextureArrays = false;
 
 	public:
 		std::string name;
@@ -56,6 +57,7 @@ namespace potent {
 
 		// Use max amount of textures (32)  with mipmaps
 		void useMaxTexture() {
+			mUseTextureArrays = false;
 			mShaderProgram.use();
 
 			glUniform1iv(glGetUniformLocation(mShaderProgram.id, "uTexture"), 32, TEXTURE_INDICES);
@@ -65,6 +67,7 @@ namespace potent {
 
 		// Use max amount of texture arrays (32) without mipmaps but with more storage
 		void useMaxTextureArray() {
+			mUseTextureArrays = true;
 			mShaderProgram.use();
 
 			glUniform1iv(glGetUniformLocation(mShaderProgram.id, "uTextureArray"), 32, TEXTURE_INDICES);
@@ -79,7 +82,12 @@ namespace potent {
 
 			for (int i = 0; i < 32; i++) {
 				if (pRenderData->texturesPtr[i] != nullptr) {
-					pRenderData->texturesPtr[i]->textureBuffer.bindUnit(i);
+					if (mUseTextureArrays) {
+						pRenderData->texturesPtr[i]->textureArrayBuffer.bindUnit(i);
+					}
+					else {
+						pRenderData->texturesPtr[i]->textureBuffer.bindUnit(i);
+					}
 				}
 			}
 
