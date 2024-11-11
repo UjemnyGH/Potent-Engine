@@ -23,9 +23,9 @@ namespace potent {
 		real zNear = 0.001f;
 		real zFar = 100.0f;
 
-		Camera() { 
+		Camera() : Component() { 
 			mComponentId = Component_Camera; 
-			componentName = "default_camera";
+			componentName = "default_camera" + std::to_string(sComponentCounter);
 		}
 
 		RMat getViewMatrix() { return mViewMatrix; }

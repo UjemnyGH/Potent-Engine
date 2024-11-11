@@ -30,10 +30,16 @@
     <ClInclude Include="src\Renderer\engineMesh.h" />
     <ClInclude Include="src\Renderer\engineRendererData.h" />
     <ClInclude Include="src\Renderer\engineRenderer.h" />
+    <ClInclude Include="src\Scene\engineAllComponents.h" />
+    <ClInclude Include="src\Scene\engineAsset.h" />
     <ClInclude Include="src\Scene\engineComponent.h" />
     <ClInclude Include="src\Scene\engineComponentIds.h" />
     <ClInclude Include="src\Scene\engineLights.h" />
     <ClInclude Include="src\Scene\engineScene.h" />
+    <ClInclude Include="src\Script\engineLuaLibrary.h" />
+    <ClInclude Include="src\Script\engineMonoCore.h" />
+    <ClInclude Include="src\UI\engineUICore.h" />
+    <ClInclude Include="src\UI\engineUIDebugText.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\engineImplementGL.cpp" />
@@ -149,7 +155,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\vendor\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;lua54.lib;libmono-static-sgen.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,7 +176,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\vendor\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;lua54.lib;libmono-static-sgen.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

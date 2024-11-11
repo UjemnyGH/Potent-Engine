@@ -9,15 +9,74 @@
 namespace potent {
 	class Scene {
 	private:
-		ShaderStorageBuffer mShaderLightDataStorage;
+		// Indexed by potent::LightType_X
+		ShaderStorageBuffer mShaderLightDataStorage[3];
 
 	public:
+		std::vector<Component*> componentsPointer;
 		bool awakend = false;
 		bool started = false;
 		
 		std::string name = "default_scene";
 
-		ShaderStorageBuffer* getShaderLightStorage() { return &mShaderLightDataStorage; }
+		void addComponent(Component* pComponent) { componentsPointer.push_back(pComponent); }
+
+		// Searches through all scene components to find desired component
+		template<int id>
+		Component* getComponent(std::string name) {
+			for (auto component : componentsPointer) {
+				if (component->getComponentId() == id && component->componentName == name) {
+					return component;
+				}
+			}
+
+			return nullptr;
+		}
+
+		// Search through childs to find component
+		template<int id>
+		Component* getComponentChilds(Component* pComponent, std::string name) {
+			Component* result = nullptr;
+
+			for (auto child : pComponent->pChilds) {
+				if (child->getComponentId() == id && child->componentName == name) {
+					result = child;
+
+					break;
+				}
+
+				result = checkComponnetChilds<id>(child, name);
+
+				if (result != nullptr) break;
+			}
+
+			return result;
+		}
+
+		// Searches through parents and childs to find component
+		template<int id>
+		Component* findComponent(std::string name) {
+			Component* result = nullptr;
+
+			for (auto component : componentsPointer) {
+				Component* currentComponent = component;
+
+				if (currentComponent->getComponentId() == id && currentComponent->componentName == name) {
+					result = currentComponent;
+
+					break;
+				}
+
+				result = checkComponnetChilds<id>(currentComponent, name);
+
+				if (result != nullptr) break;
+			}
+
+			return result;
+		}
+
+		// Gets scene light storage buffer based on potent::LightType_X
+		ShaderStorageBuffer* getLightStorage() { return mShaderLightDataStorage; }
 
 		virtual void awake() {}
 		virtual void start() {}
@@ -70,6 +129,8 @@ namespace potent {
 		bool mStartCalled = false;
 
 	public:
+		bool postProcessLightRendering = true;
+
 		SceneHandler() {
 			mSquareData.name = "POST_PROCESS_SQUARE";
 			mSquareData.makeModel(SQUARE_MESH);
@@ -80,6 +141,11 @@ namespace potent {
 			mSquareRender.joinData();
 		}
 
+		void reinitializeSceneRenderer() {
+			mFirstTimeInitialization = true;
+		}
+
+		Texture* getPostProcessingTexturePointer(int index) { return &mPostProcessingTextures[index]; }
 		Renderer* getPostProcessingRendererPointer() { return &mRenderer; }
 		RenderData* getPostProcessingSquareRenderDataPointer() { return &mSquareRender; }
 
@@ -164,48 +230,51 @@ namespace potent {
 			
 			if (mCurrentScene == nullptr) return;
 
-			mRenderer()->use();
+			if (postProcessLightRendering) {
 
-			glUniform4f(glGetUniformLocation(mRenderer()->id, "uViewPosition"), 0.0f, 0.0f, 0.0f, 0.0f);
+				mRenderer()->use();
 
-			mRenderer()->unuse();
+				if (mRenderer()->linked) {
+					glUniform4f(glGetUniformLocation(mRenderer()->id, "uViewPosition"), 0.0f, 0.0f, 0.0f, 0.0f);
+				}
 
-			mSceneGeometryBuffer.initGraphicsBuffer(width, height);
-			mSceneGeometryBuffer.startGraphicsBuffer();
+				mRenderer()->unuse();
 
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+				mSceneGeometryBuffer.initGraphicsBuffer(width, height);
+				mSceneGeometryBuffer.startGraphicsBuffer();
+			}
+
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 			glClear(0x4100);
 
 			mCurrentScene->update();
 
-			mSceneGeometryBuffer.endGraphicsBuffer();
+			if (postProcessLightRendering) {
+				mSceneGeometryBuffer.endGraphicsBuffer();
 
-			glClear(0x4100);
+				if (mFirstTimeInitialization) {
+					mRenderer.attachShader(pPostProcessLightVertexShader);
+					mRenderer.attachShader(pPostProcessLightFragmentShader);
+					mRenderer.relinkShaderProgram();
 
-			// TODO: Render
+					mRenderer.useMaxTexture();
 
-			if (mFirstTimeInitialization) {
-				mRenderer.attachShader(pPostProcessLightVertexShader);
-				mRenderer.attachShader(pPostProcessLightFragmentShader);
-				mRenderer.relinkShaderProgram();
+					mSquareRender.bindData();
+				
+					mFirstTimeInitialization = false;
+				}
 
-				mRenderer.useMaxTexture();
+				mPostProcessingTextures[0].name = "GBUFFER_POSITION_TEXTURE";
+				mPostProcessingTextures[1].name = "GBUFFER_NORMAL_TEXTURE";
+				mPostProcessingTextures[2].name = "GBUFFER_DIFFUSE_SPECULAR_TEXTURE";
 
-				mFirstTimeInitialization = false;
+				for (std::uint32_t i = 0; i < mSceneGeometryBuffer.USED_TEXTURES; i++) {
+					mPostProcessingTextures[i].textureBuffer = mSceneGeometryBuffer.textures[i];
+					mSquareRender.texturesPtr[i] = &mPostProcessingTextures[i];
+				}
+
+				mRenderer.render(&mSquareRender, RMat::Identity(), RMat::Identity());
 			}
-
-			mSquareRender.bindData();
-
-			mPostProcessingTextures[0].name = "GBUFFER_POSITION_TEXTURE";
-			mPostProcessingTextures[1].name = "GBUFFER_NORMAL_TEXTURE";
-			mPostProcessingTextures[2].name = "GBUFFER_DIFFUSE_SPECULAR_TEXTURE";
-
-			for (std::uint32_t i = 0; i < mSceneGeometryBuffer.USED_TEXTURES; i++) {
-				mPostProcessingTextures[i].textureBuffer = mSceneGeometryBuffer.textures[i];
-				mSquareRender.texturesPtr[i] = &mPostProcessingTextures[i];
-			}
-
-			mRenderer.render(&mSquareRender, RMat::Identity(), RMat::Identity());
 		}
 
 		void lateUpdateCurrent() {

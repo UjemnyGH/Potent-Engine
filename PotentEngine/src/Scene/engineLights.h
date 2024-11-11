@@ -3,14 +3,42 @@
 #define _POTENT_ENGINE_LIGHTS_
 
 #include "../Core/engineMath.h"
+#include "../Core/engineFileSystem.h"
 #include "engineComponent.h"
 
 namespace potent {
-#define DIRECTIONAL_LIGHT 0.0f
-#define POINT_LIGHT 1.0f
-#define SPOT_LIGHT 2.0f
+	enum LightType {
+		LightType_Directional = 0,
+		LightType_Point = 1,
+		LightType_Spot = 2
+	};
 
-	struct LightingData {
+	enum PostProcessFlags {
+		PostProcess_DisableLighting = 0x1,
+	};
+
+	struct DirectionalLightData {
+		RVec direction;
+		RVec ambient;
+		RVec diffuse;
+		RVec specular;
+	};
+
+	struct PointLightData {
+		// point and spot light
+		RVec position;
+
+		RVec ambient;
+		RVec diffuse;
+		RVec specular;
+
+		// point/spot light
+		float constant;
+		float linear;
+		float quadratic;
+	};
+
+	struct SpotLightData {
 		RVec direction;
 		// point and spot light
 		RVec position;
@@ -25,17 +53,18 @@ namespace potent {
 		// spotlight
 		float cutOff;
 		float outerCutOff;
-		// light type
-		float lightType;
 	};
 
 	class Light : public Component {
 	public:
-		LightingData lightingData;
+		DirectionalLightData directionalLightData;
+		PointLightData pointLightData;
+		SpotLightData spotLightData;
+		int lightType;
 
-		Light() {
+		Light() : Component() {
 			mComponentId = Component_Light;
-			componentName = "default_light";
+			componentName = "default_light" + std::to_string(sComponentCounter);
 		}
 	};
 }

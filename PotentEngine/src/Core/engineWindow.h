@@ -7,6 +7,15 @@
 #include "engineCore.h"
 
 namespace potent {
+	void openGlDebugMessageCallback(std::uint32_t source, std::uint32_t type, std::uint32_t id, std::uint32_t severity, std::int32_t length, const char* message, const void* userParam) {
+		if (type == GL_DEBUG_TYPE_ERROR) {
+			ENGINE_GL_ERROR("Type: 0x" << std::hex << type << ", Severity: 0x" << severity << " > " << message << std::dec);
+		}
+		else if (type != GL_DEBUG_TYPE_OTHER && severity != GL_DEBUG_SEVERITY_NOTIFICATION) {
+			ENGINE_GL_WARN("Type: 0x" << std::hex << type << ", Severity: 0x" << severity << " > " << message << std::dec);
+		}
+	}
+
 	class Window {
 	private:
 		GLFWwindow* mWindowPtr;
@@ -15,7 +24,7 @@ namespace potent {
 		static Window* instance;
 		static double mouseX, mouseY;
 		static int windowWidth, windowHeight;
-		static double engineTime, engineDeltaTime, engineLastTime;
+		static double engineTime, engineDeltaTime, engineLastTime, engineFixedDeltaTime;
 
 		virtual void awake() {}
 		virtual void start() {}
@@ -50,7 +59,7 @@ namespace potent {
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-			glfwWindowHint(GLFW_SAMPLES, 16);
+			//glfwWindowHint(GLFW_SAMPLES, 16);
 
 			mWindowPtr = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
@@ -68,7 +77,9 @@ namespace potent {
 				return;
 			}
 
-			glEnable(GL_MULTISAMPLE);
+			//glEnable(GL_MULTISAMPLE);
+			glEnable(GL_DEBUG_OUTPUT);
+			glDebugMessageCallback(openGlDebugMessageCallback, 0);
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -112,7 +123,8 @@ namespace potent {
 
 	double Window::engineTime = 0.0;
 	double Window::engineDeltaTime = 0.0;
-	double Window::engineLastTime = 0.0f;
+	double Window::engineLastTime = 0.0;
+	double Window::engineFixedDeltaTime = 0.0;
 }
 
 #endif

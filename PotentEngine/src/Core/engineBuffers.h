@@ -69,6 +69,7 @@ namespace potent {
 	struct ShaderProgram {
 		std::uint32_t id;
 		bool created = false;
+        bool linked = false;
 
 		void init() {
 			if (!created) {
@@ -92,6 +93,8 @@ namespace potent {
 			std::int32_t isLinked = 0;
 			glGetProgramiv(id, GL_LINK_STATUS, &isLinked);
 
+            linked = isLinked;
+
 			if (!isLinked) {
 				std::int32_t maxLength = 0;
 				glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
@@ -109,7 +112,9 @@ namespace potent {
 		void use() {
 			init();
 
-			glUseProgram(id);
+            if (linked) {
+			    glUseProgram(id);
+            }
 		}
 
 		void unuse() {
@@ -121,6 +126,7 @@ namespace potent {
 				glDeleteProgram(id);
 
 				created = false;
+                linked = false;
 			}
 		}
 	};
@@ -242,9 +248,9 @@ namespace potent {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             }
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 16);
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 16);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
             glGenerateMipmap(GL_TEXTURE_2D);
 
         }
@@ -278,16 +284,17 @@ namespace potent {
 
         void bindUnit(uint32_t unit_id) {
             init();
-
+            //glActiveTexture(GL_TEXTURE0 + unit_id);
+            //glBindTexture(GL_TEXTURE_2D_ARRAY, id);
             glBindTextureUnit(unit_id, id);
         }
 
         void bindData(std::vector<uint8_t> data, uint32_t width, uint32_t height, bool pixels = false, uint32_t layerCount = 1) {
             bind();
 
-            glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, layerCount);
+            glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_SRGB8_ALPHA8, width, height, layerCount);
             glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, layerCount, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
-            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 16);
+            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 1000);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -472,9 +479,9 @@ namespace potent {
                 textures[i].init();
             }
 
-            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA16F, GL_RGBA, textures[0].id, GL_COLOR_ATTACHMENT0);
-            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA16F, GL_RGBA, textures[1].id, GL_COLOR_ATTACHMENT1);
-            graphicsBuffer.getData(width, height, GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA, textures[2].id, GL_COLOR_ATTACHMENT2);
+            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA32F, GL_RGBA, textures[0].id, GL_COLOR_ATTACHMENT0);
+            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA32F, GL_RGBA, textures[1].id, GL_COLOR_ATTACHMENT1);
+            graphicsBuffer.getData(width, height, GL_UNSIGNED_BYTE, GL_RGBA8, GL_RGBA, textures[2].id, GL_COLOR_ATTACHMENT2);
 
             unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
             glDrawBuffers(USED_TEXTURES, attachments);
@@ -493,6 +500,14 @@ namespace potent {
 
         void endGraphicsBuffer() {
             graphicsBuffer.unbind();
+        }
+
+        void copyDepthToAnotherFramebuffer(int sourceWidth, int sourceHeight, int destinationWidth, int destinationHeight, int anotherFramebuffer = 0) {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, graphicsBuffer.id);
+            glBindFramebuffer(GL_DRAW_BUFFER, anotherFramebuffer);
+
+            glBlitFramebuffer(0, 0, sourceWidth, sourceHeight, 0, 0, destinationWidth, destinationHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+            glBindFramebuffer(GL_FRAMEBUFFER, anotherFramebuffer);
         }
     };
 
@@ -518,7 +533,7 @@ namespace potent {
             glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         }
 
-        void bindData(void* data, std::size_t size, std::uint32_t bindingBase = 1) {
+        void bindData(void* data, std::size_t size, std::uint32_t bindingBase = 0) {
             bind();
 
             glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_DRAW);

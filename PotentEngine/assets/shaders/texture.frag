@@ -13,25 +13,25 @@ in vec3 vNor;
 in vec4 vPos;
 
 void main() {
-	int texId = int(vTexId);
+	int texId = int(ceil(vTexId));
 
 	vec4 result = vec4(1.0, 1.0, 1.0, 1.0);
 
 	if(texId < 32) {
-		result = texture(uTextureArray[texId], vec3(vTexC.xy, 0.0));
+		result = texture(uTextureArray[texId], vec3(vTexC.xy, 1));
 	}
 
-	result = result * vCol;
+	result *= vCol;
 
 	oAlbedo.rgb = vec3(result.rgb);
 
 	if(texId < 32) {
-		oAlbedo.a = texture(uTextureArray[texId], vec3(vTexC.xy, 0.0)).a;
+		oAlbedo.a = texture(uTextureArray[texId], vec3(vTexC.xy, 1)).a;
 	}
 	else {
 		oAlbedo.a = 0.1f;
 	}
 
-	oPos = vPos;
+	oPos = vec4(vPos.xyz, 1.0);
 	oNor = vec4(normalize(vNor), 1.0);
 }

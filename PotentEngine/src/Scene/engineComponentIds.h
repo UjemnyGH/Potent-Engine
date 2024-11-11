@@ -10,6 +10,7 @@ namespace potent {
 		Component_Particle,
 		Component_Mesh,
 		Component_Light,
+		Component_Asset,
 
 		Component_COUNT,
 	};

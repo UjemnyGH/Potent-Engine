@@ -16,6 +16,12 @@
     <ClInclude Include="src\Scene\engineComponent.h" />
     <ClInclude Include="src\Scene\engineComponentIds.h" />
     <ClInclude Include="src\Scene\engineLights.h" />
+    <ClInclude Include="src\Script\engineLuaLibrary.h" />
+    <ClInclude Include="src\Scene\engineAsset.h" />
+    <ClInclude Include="src\Scene\engineAllComponents.h" />
+    <ClInclude Include="src\Script\engineMonoCore.h" />
+    <ClInclude Include="src\UI\engineUICore.h" />
+    <ClInclude Include="src\UI\engineUIDebugText.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\run.cpp" />

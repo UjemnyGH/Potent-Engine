@@ -3,6 +3,7 @@
 #define _POTENT_ENGINE_MESH_
 
 #include "../Core/engineCore.h"
+#include "../Core/engineMath.h"
 #include <vector>
 #include <fstream>
 #include <string>
@@ -392,6 +393,48 @@ namespace potent {
         }
 
         return MeshRawData();
+    }
+
+    void negateMeshNormals(MeshRawData* pMesh) {
+        std::vector<float> tempNormals;
+
+        for (std::size_t i = 0; i < pMesh->normals.size() / 3; i++) {
+            RVec normal = RVec(pMesh->normals[i * 3 + 0], pMesh->normals[i * 3 + 1], pMesh->normals[i * 3 + 2]).Negate();
+
+            tempNormals.push_back(normal.x);
+            tempNormals.push_back(normal.y);
+            tempNormals.push_back(normal.z);
+        }
+
+        pMesh->normals.clear();
+        std::copy(tempNormals.begin(), tempNormals.end(), std::back_inserter(pMesh->normals));
+    }
+
+    void calculateNormalsBasedOnVertices(MeshRawData* pMesh) {
+        std::vector<float> tempNormals;
+
+        for (std::size_t i = 0; i < pMesh->vertices.size() / 9; i++) {
+            RVec a = RVec(pMesh->vertices[i * 9 + 0], pMesh->vertices[i * 9 + 1], pMesh->vertices[i * 9 + 2]);
+            RVec b = RVec(pMesh->vertices[i * 9 + 3], pMesh->vertices[i * 9 + 4], pMesh->vertices[i * 9 + 5]);
+            RVec c = RVec(pMesh->vertices[i * 9 + 6], pMesh->vertices[i * 9 + 7], pMesh->vertices[i * 9 + 8]);
+
+            RVec normal = RVec::PlaneNormal(a, b, c);
+
+            tempNormals.push_back(normal.x);
+            tempNormals.push_back(normal.y);
+            tempNormals.push_back(normal.z);
+
+            tempNormals.push_back(normal.x);
+            tempNormals.push_back(normal.y);
+            tempNormals.push_back(normal.z);
+
+            tempNormals.push_back(normal.x);
+            tempNormals.push_back(normal.y);
+            tempNormals.push_back(normal.z);
+        }
+
+        pMesh->normals.clear();
+        std::copy(tempNormals.begin(), tempNormals.end(), std::back_inserter(pMesh->normals));
     }
 }
 

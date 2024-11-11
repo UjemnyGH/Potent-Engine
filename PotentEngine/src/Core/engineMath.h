@@ -80,6 +80,8 @@ namespace potent {
         Vector<T>() { x = y = z = w = static_cast<T>(0); }
         Vector<T>(T init) { x = y = z = w = init; }
         Vector<T>(T _x, T _y, T _z = static_cast<T>(0), T _w = static_cast<T>(0)) : x(_x), y(_y), z(_z), w(_w) {}
+        template<typename TN>
+        Vector<T>(Vector<TN> vec) { x = (T)vec.x; y = (T)vec.y; z = (T)vec.z; w = (T)vec.w; }
 
         inline Vector<T> operator+(T v) { return Vector<T>(this->x + v, this->y + v, this->z + v, this->w + v); }
         inline Vector<T> operator-(T v) { return Vector<T>(this->x - v, this->y - v, this->z - v, this->w - v); }
@@ -100,6 +102,8 @@ namespace potent {
         inline Vector<T> operator-=(Vector<T> v) { return (*this = this->operator-(v)); }
         inline Vector<T> operator*=(Vector<T> v) { return (*this = this->operator*(v)); }
         inline Vector<T> operator/=(Vector<T> v) { return (*this = this->operator/(v)); }
+
+        inline void operator=(T* cvec) { cvec[0] = x; cvec[1] = y; cvec[2] = z; cvec[3] = w; }
 
         inline bool operator==(Vector<T> v) { return x == v.x && y == v.y && z == v.z && w == v.w; }
         inline bool operator!=(Vector<T> v) { return x != v.x || y != v.y || z != v.z || w != v.w; }
@@ -233,6 +237,8 @@ namespace potent {
 
         inline Vector<T> Clamp(T const& min, T const& max) { return Vector<T>(std::clamp(x, min, max), std::clamp(y, min, max), std::clamp(z, min, max), std::clamp(w, min, max)); }
         inline static Vector<T> Clamp(Vector<T> v, T min, T max) { return Vector<T>(std::clamp(v.x, min, max), std::clamp(v.y, min, max), std::clamp(v.z, min, max), std::clamp(v.w, min, max)); }
+
+        inline void FillArray(T* arr) { arr[0] = x; arr[1] = y; arr[2] = z; arr[3] = w; }
     };
 
     typedef Vector<float> FVec;
@@ -247,6 +253,11 @@ namespace potent {
         Matrix3<T>() { Fill(static_cast<T>(0)); }
         Matrix3<T>(T init) { Fill(init); }
         Matrix3<T>(Matrix3<T> const& v) { std::memcpy(m, v.m, 9 * sizeof(T)); }
+
+        template<typename TN>
+        Matrix3<T>(Matrix3<TN> v) {
+            for (int i = 0; i < 9; i++) m[i] = (T)v.m[i];
+        }
 
         void Fill(T value) { std::fill(m, m + 9, value); }
 
@@ -348,6 +359,11 @@ namespace potent {
 
         Matrix4<T>() { Fill(static_cast<T>(0)); }
         Matrix4<T>(T v) { Fill(v); }
+
+        template<typename TN>
+        Matrix4<T>(Matrix4<TN> v) { 
+            for (int i = 0; i < 16; i++) m[i] = (T)v.m[i];
+        }
 
         /**
          * @brief Fill entire matrix with value
@@ -889,36 +905,37 @@ namespace potent {
      * @brief Point transform class
      *
      */
+    template<typename T>
     class Transform {
     private:
-        Vector<real> mPosition;
-        Vector<real> mScale;
-        Vector<real> mRotation;
-        Matrix4<real> mTransformMatrix = Matrix4<float>::Identity();
+        Vector<T> mPosition;
+        Vector<T> mScale;
+        Vector<T> mRotation;
+        Matrix4<T> mTransformMatrix = Matrix4<T>::Identity();
 
         /**
          * @brief Recalculatin entire matrix
          *
          */
         void __RecalculateMatrix() {
-            mTransformMatrix = Matrix4<real>::Scale(mScale) * Matrix4<real>::RotateX(mRotation.x) * Matrix4<real>::RotateY(mRotation.y) * Matrix4<real>::RotateZ(mRotation.z) * Matrix4<real>::Translate(mPosition);
+            mTransformMatrix = Matrix4<T>::Scale(mScale) * Matrix4<T>::RotateX(mRotation.x) * Matrix4<T>::RotateY(mRotation.y) * Matrix4<T>::RotateZ(mRotation.z) * Matrix4<T>::Translate(mPosition);
         }
 
     public:
         Transform() {
-            mScale = Vector<real>(1.0, 1.0, 1.0);
+            mScale = Vector<T>(1.0, 1.0, 1.0);
 
             __RecalculateMatrix();
         }
 
-        Matrix4<real>* operator()() { return &mTransformMatrix; }
+        Matrix4<T>* operator()() { return &mTransformMatrix; }
 
         /**
          * @brief Set the Position
          *
          * @param v
          */
-        void SetPosition(Vector<real> const& v) {
+        void SetPosition(Vector<T> const& v) {
             mPosition = v;
 
             __RecalculateMatrix();
@@ -929,7 +946,7 @@ namespace potent {
          *
          * @param v
          */
-        void SetScale(Vector<real> const& v) {
+        void SetScale(Vector<T> const& v) {
             mScale = v;
 
             __RecalculateMatrix();
@@ -940,7 +957,7 @@ namespace potent {
          *
          * @param v
          */
-        void SetRotation(Vector<real> const& v) {
+        void SetRotation(Vector<T> const& v) {
             mRotation = v;
 
             __RecalculateMatrix();
@@ -951,7 +968,7 @@ namespace potent {
          *
          * @return Matrix4<real>
          */
-        Matrix4<real> GetTransform() {
+        Matrix4<T> GetTransform() {
             return mTransformMatrix;
         }
 
@@ -960,8 +977,8 @@ namespace potent {
          *
          * @return Vector<real>
          */
-        Vector<real> GetPosition() {
-            return mPosition;
+        Vector<T>* GetPosition() {
+            return &mPosition;
         }
 
         /**
@@ -969,8 +986,8 @@ namespace potent {
          *
          * @return Vector<real>
          */
-        Vector<real> GetScale() {
-            return mScale;
+        Vector<T>* GetScale() {
+            return &mScale;
         }
 
         /**
@@ -978,8 +995,8 @@ namespace potent {
          *
          * @return Vector<real>
          */
-        Vector<real> GetRotation() {
-            return mRotation;
+        Vector<T>* GetRotation() {
+            return &mRotation;
         }
     };
 
@@ -1009,9 +1026,39 @@ namespace potent {
         return out;
     }
 
+    template<class T>
+    inline std::string operator+(std::string out, const Vector<T>& vec) {
+        out += "X: " + std::to_string(vec.x) + " Y: " + std::to_string(vec.y) + " Z: " + std::to_string(vec.z) + " W: " + std::to_string(vec.w);
+
+        return out;
+    }
+
+    template<class T>
+    inline std::string operator+(std::string out, const Matrix3<T>& m) {
+        out += std::to_string(m.m[0]) + ", " + std::to_string(m.m[1]) + ", " + std::to_string(m.m[2]) + "\n"
+            + std::to_string(m.m[3]) + ", " + std::to_string(m.m[4]) + ", " + std::to_string(m.m[5]) + "\n"
+            + std::to_string(m.m[6]) + ", " + std::to_string(m.m[7]) + ", " + std::to_string(m.m[8]);
+
+        return out;
+    }
+
+    template<class T>
+    inline std::string operator+(std::string out, const Matrix4<T>& m) {
+        out += std::to_string(m.m[0]) + ", " + std::to_string(m.m[1]) + ", " + std::to_string(m.m[2]) + ", " + std::to_string(m.m[3]) + "\n"
+            + std::to_string(m.m[4]) + ", " + std::to_string(m.m[5]) + ", " + std::to_string(m.m[6]) + ", " + std::to_string(m.m[7]) + "\n"
+            + std::to_string(m.m[8]) + ", " + std::to_string(m.m[9]) + ", " + std::to_string(m.m[10]) + ", " + std::to_string(m.m[11]) + "\n"
+            + std::to_string(m.m[12]) + ", " + std::to_string(m.m[13]) + ", " + std::to_string(m.m[14]) + ", " + std::to_string(m.m[15]);
+
+        return out;
+    }
+
     typedef Matrix4<float> FMat;
     typedef Matrix4<double> DMat;
     typedef Matrix4<real> RMat;
+
+    typedef Transform<float> FTransform;
+    typedef Transform<double> DTransform;
+    typedef Transform<real> RTransform;
 }
 
 #endif

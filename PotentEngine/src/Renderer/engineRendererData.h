@@ -19,14 +19,14 @@ namespace potent {
 	public:
 		// Unoptimized but effective way of searching models
 		std::string name;
-		Transform transform;
+		RTransform transform;
 		MeshRawData meshData;
 		std::vector<float> colors;
 		std::vector<float> textureId;
 
-		RenderObjectData() {
+		RenderObjectData() : Component() {
 			mComponentId = Component_Mesh;
-			componentName = "default_mesh";
+			componentName = "default_mesh" + std::to_string(sComponentCounter);
 		}
 
 		RenderObjectData(MeshRawData mesh) {
@@ -42,6 +42,40 @@ namespace potent {
 			textureId.resize((meshData.vertices.size() / 3));
 			std::fill(textureId.begin(), textureId.end(), 32.0f);
 			transform.SetScale(RVec(1.0f));
+		}
+
+		void debugDraw(RMat projection, RMat view, int type = GL_LINES) {
+			Shader vs, fs;
+			vs.loadFromMemory(DEBUG_DRAW_VERTEX_SHADER, GL_VERTEX_SHADER);
+			fs.loadFromMemory(DEBUG_DRAW_FRAGMNET_SHADER, GL_FRAGMENT_SHADER);
+			ShaderProgram sp;
+			sp.attach(&vs);
+			sp.attach(&fs);
+			sp.link();
+
+			VArray vao;
+			VBuffer vbo;
+
+			sp.use();
+			vao.bind();
+
+			vbo.bindPlace(3, 0);
+			vbo.bindData(meshData.vertices);
+
+			glUniformMatrix4fv(glGetUniformLocation(sp.id, "uProjection"), 1, 0, projection.m);
+			glUniformMatrix4fv(glGetUniformLocation(sp.id, "uView"), 1, 0, view.m);
+			glUniformMatrix4fv(glGetUniformLocation(sp.id, "uTransform"), 1, 1, transform.GetTransform().m);
+
+			glDrawArrays(type, 0, meshData.vertices.size() / 3);
+
+			vao.unbind();
+			sp.unuse();
+
+			vs.~Shader();
+			fs.~Shader();
+			sp.~ShaderProgram();
+			vao.~VArray();
+			vbo.~VBuffer();
 		}
 	};
 
@@ -62,6 +96,12 @@ namespace potent {
 		std::array<Texture*, 32> texturesPtr;
 
 		bool rejoinedDataBound = false;
+
+		RenderData() {
+			for (int i = 0; i < 32; i++) {
+				texturesPtr[i] = nullptr;
+			}
+		}
 
 		void bindData() {
 			if (!rejoinedDataBound) {
@@ -98,9 +138,18 @@ namespace potent {
 					verticesTemp.push_back(vertex.x);
 					verticesTemp.push_back(vertex.y);
 					verticesTemp.push_back(vertex.z);
+
+					if (data->meshData.vertices.size() == data->meshData.normals.size()) {
+						RVec normal = (data->transform.GetTransform() * RVec(data->meshData.normals[i * 3 + 0], data->meshData.normals[i * 3 + 1], data->meshData.normals[i * 3 + 2], 0.0f)).Normalize();
+						
+						normalsTemp.push_back(normal.x);
+						normalsTemp.push_back(normal.y);
+						normalsTemp.push_back(normal.z);
+					}
 				}
 
-				std::copy(data->meshData.normals.begin(), data->meshData.normals.end(), std::back_inserter(normalsTemp));
+				if (data->meshData.vertices.size() != data->meshData.normals.size())
+					std::copy(data->meshData.normals.begin(), data->meshData.normals.end(), std::back_inserter(normalsTemp));
 				std::copy(data->meshData.textureCoordinates.begin(), data->meshData.textureCoordinates.end(), std::back_inserter(texCoordsTemp));
 				std::copy(data->colors.begin(), data->colors.end(), std::back_inserter(colorsTemp));
 				std::copy(data->textureId.begin(), data->textureId.end(), std::back_inserter(textureIdTemp));

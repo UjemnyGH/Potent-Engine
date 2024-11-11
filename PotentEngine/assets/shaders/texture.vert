@@ -16,12 +16,20 @@ out float vTexId;
 out vec3 vNor;
 out vec4 vPos;
 
+out mat4 vProjection;
+out mat4 vView;
+out mat4 vTransform;
+
 void main() {
 	vCol = iCol;
 	vTexC = iTexC;
 	vTexId = iTexId;
 	vNor = transpose(inverse(mat3(uTransform))) * iNor;
-	vPos = uTransform * iPos;
+	vPos = uTransform * vec4(iPos.xyz, 1.0);
+
+	vProjection = uProjection;
+	vView = uView;
+	vTransform = uTransform;
 
 	gl_Position = uProjection * uView * uTransform * iPos;
 }
