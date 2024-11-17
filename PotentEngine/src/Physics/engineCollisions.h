@@ -206,13 +206,13 @@ namespace potent {
 
 	RVec lineTriangleIntersectionPoint(RVec rayPosition, RVec rayDirection, RVec t1, RVec t2, RVec t3) {
 		// Normals needs to be NOT normalized
-		RVec normal = (t2 - t1).Cross(t3 - t1);
+		RVec normal = (t2 - t1).Cross(t3 - t1).Normalize();
 
 		// nx * dx + ny * dy + nz * dz
-		real denominator = normal.Dot(rayDirection);
+		real denominator = normal.Dot(rayDirection.Negate());
 
 		// Denominator needs to be higher than 0
-		if (abs(denominator) < 1e-6) {
+		if (abs(denominator) <= 0) {
 			return RVec(0.0f, 0.0f, 0.0f, 1.0f);
 		}
 

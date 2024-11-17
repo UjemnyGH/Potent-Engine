@@ -23,13 +23,20 @@ C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineMesh.h(3
 C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRendererData.h(69,51): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/run.cpp”)
   
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(96,61): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(115,61): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/run.cpp”)
   
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(161,61): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(168,29): warning C4267: "=": konwersja z "size_t" do "_Ty", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(168,29): warning C4267:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(168,29): warning C4267:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(168,29): warning C4267:             _Ty=uint32_t
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(168,29): warning C4267:         ]
   (kompilowanie pliku źródłowego „src/run.cpp”)
   
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(346,57): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(282,57): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineRenderer.h(471,57): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/run.cpp”)
   
 C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineCamera.h(35,15): warning C4244: "inicjowanie": konwersja z "double" do "float", możliwa utrata danych
@@ -47,18 +54,48 @@ C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Renderer\engineCamera.h
 C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\UI\engineUIDebugText.h(296,57): warning C4267: "argument": konwersja z "size_t" do "GLsizei", możliwa utrata danych
   (kompilowanie pliku źródłowego „src/run.cpp”)
   
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(200,21): warning C4930: "std::stringstream ss(std::string (__cdecl *)(void))": prototypowana funkcja nie została wywołana (czy definicja zmiennej była zamierzona?)
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,46): warning C4244: "argument": konwersja z "T" do "float", możliwa utrata danych
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,46): warning C4244:         with
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,46): warning C4244:         [
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,46): warning C4244:             T=double
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,46): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(325,21): warning C4930: "std::stringstream ss(std::string (__cdecl *)(void))": prototypowana funkcja nie została wywołana (czy definicja zmiennej była zamierzona?)
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(623,46): warning C4244: "argument": konwersja z "int" do "T", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(623,46): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(623,46): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(623,46): warning C4244:             T=float
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(623,46): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(627,55): warning C4244: "argument": konwersja z "int" do "T", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(627,55): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(627,55): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(627,55): warning C4244:             T=float
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(627,55): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(632,45): warning C4244: "argument": konwersja z "int" do "T", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(632,45): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(632,45): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(632,45): warning C4244:             T=float
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(632,45): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(636,36): warning C4244: "argument": konwersja z "int" do "T", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(636,36): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(636,36): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(636,36): warning C4244:             T=float
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(636,36): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(641,66): warning C4244: "argument": konwersja z "int" do "T", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(641,66): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(641,66): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(641,66): warning C4244:             T=float
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(641,66): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(645,75): warning C4244: "argument": konwersja z "int" do "T", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(645,75): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(645,75): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(645,75): warning C4244:             T=float
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(645,75): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,46): warning C4244: "argument": konwersja z "T" do "float", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,46): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,46): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,46): warning C4244:             T=double
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,46): warning C4244:         ]
   (kompilowanie pliku źródłowego „src/run.cpp”)
-      C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,46):
+      C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,46):
       kontekst tworzenia wystąpienia szablonu (najpierw najstarszy) to
           C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Physics\engineParticle.h(12,8):
           zobacz odwołanie do kompilowanego tworzenia wystąpienia „potent::Vector<double>” klasy klasa szablon
-          C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,18):
+          C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(154,18):
           podczas kompilowania funkcji składowej „T potent::Vector<T>::Length(void)” klasy klasa szablon
           with
           [
@@ -67,28 +104,109 @@ C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(152,4
               C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Physics\engineParticle.h(79,18):
               zobacz pierwsze odwołanie do elementu „potent::Vector<double>::Length” w „potent::ParticleDragGenerator::generateForce”
   
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,75): warning C4244: "argument": konwersja z "T" do "float", możliwa utrata danych
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,75): warning C4244:         with
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,75): warning C4244:         [
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,75): warning C4244:             T=double
-C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,75): warning C4244:         ]
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,75): warning C4244: "argument": konwersja z "T" do "float", możliwa utrata danych
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,75): warning C4244:         with
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,75): warning C4244:         [
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,75): warning C4244:             T=double
+C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,75): warning C4244:         ]
   (kompilowanie pliku źródłowego „src/run.cpp”)
-      C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,75):
+      C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,75):
       kontekst tworzenia wystąpienia szablonu (najpierw najstarszy) to
-          C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(160,25):
+          C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(162,25):
           podczas kompilowania funkcji składowej „T potent::Vector<T>::Length(potent::Vector<T>)” klasy klasa szablon
           with
           [
               T=double
           ]
-              C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(168,50):
+              C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\Core\engineMath.h(170,50):
               zobacz pierwsze odwołanie do elementu „potent::Vector<double>::Length” w „potent::Vector<double>::Distance”
-              C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(442,5):
+              C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(701,5):
               zobacz pierwsze odwołanie do elementu „potent::Vector<double>::Distance” w „MainScene::fixedUpdate”
   
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244: "inicjowanie": konwersja z "T" do "_Ty", możliwa utrata danych
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:             T=double
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:         ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:         and
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:             _Ty=float
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54): warning C4244:         ]
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(389,54):
+      kontekst tworzenia wystąpienia szablonu (najpierw najstarszy) to
+          C:\Users\0x55\source\repos\PotentEngine\PotentEngine\src\run.cpp(716,41):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „float &std::vector<float,std::allocator<float>>::emplace_back<T&>(T &)” funkcji szablon
+          with
+          [
+              T=double
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\vector(858,24):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_one_at_back<T&>(T &)” funkcji szablon
+          with
+          [
+              _Ty=float,
+              T=double
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\vector(776,20):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „_Ty &std::vector<_Ty,std::allocator<_Ty>>::_Emplace_back_with_unused_capacity<T&>(T &)” funkcji szablon
+          with
+          [
+              _Ty=float,
+              T=double
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\vector(791,13):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „void std::_Construct_in_place<float,T&>(_Ty &,T &) noexcept” funkcji szablon
+          with
+          [
+              T=double,
+              _Ty=float
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(399,14):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „_Ty *std::construct_at<_Ty,T&>(_Ty *const ,T &) noexcept(<expr>)” funkcji szablon
+          with
+          [
+              _Ty=float,
+              T=double
+          ]
+  
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(403,61): warning C4244: "inicjowanie": konwersja z "T" do "float", możliwa utrata danych
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(403,61): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(403,61): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(403,61): warning C4244:             T=double
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(403,61): warning C4244:         ]
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+  
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244: "inicjowanie": konwersja z "T" do "_Ty", możliwa utrata danych
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:         with
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:             T=double
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:         ]
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:         and
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:         [
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:             _Ty=float
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69): warning C4244:         ]
+  (kompilowanie pliku źródłowego „src/run.cpp”)
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(390,69):
+      kontekst tworzenia wystąpienia szablonu (najpierw najstarszy) to
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\vector(791,13):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „void std::_Construct_in_place<float,T&>(_Ty &,T &) noexcept” funkcji szablon
+          with
+          [
+              T=double,
+              _Ty=float
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.41.34120\include\xutility(399,14):
+          zobacz odwołanie do kompilowanego tworzenia wystąpienia „_Ty *std::construct_at<_Ty,T&>(_Ty *const ,T &) noexcept” funkcji szablon
+          with
+          [
+              _Ty=float,
+              T=double
+          ]
+  
   Trwa generowanie kodu
-  1 of 1467 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 1507 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    10 functions had inline decision re-evaluated but remain unchanged
+    9 functions had inline decision re-evaluated but remain unchanged
   Zakończono generowanie kodu
   PotentEngine.vcxproj -> C:\Users\0x55\source\repos\PotentEngine\Release_x64\PotentEngine_x64.exe

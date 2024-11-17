@@ -11,8 +11,11 @@ namespace potent {
 	struct Shader {
 		std::uint32_t id;
 		bool created = false;
+        int shaderType = 0;
 
 		void loadFromMemory(const char* source, std::int32_t type) {
+            shaderType = type;
+
 			id = glCreateShader(type);
 			glShaderSource(id, 1, &source, nullptr);
 			glCompileShader(id);
@@ -61,6 +64,7 @@ namespace potent {
 			if (created) {
 				glDeleteShader(id);
 
+                shaderType = 0;
 				created = false;
 			}
 		}
@@ -468,20 +472,20 @@ namespace potent {
     };
 
     struct GeometryBuffer {
-        Framebuffer graphicsBuffer;
+        Framebuffer geometryDataBuffer;
         Renderbuffer renderBuffer;
         TextureBuffer textures[32];
         const std::uint32_t USED_TEXTURES = 3;
 
         void initGraphicsBuffer(int width, int height) {
-            graphicsBuffer.bind();
+            geometryDataBuffer.bind();
             for (std::uint32_t i = 0; i < USED_TEXTURES; i++) {
                 textures[i].init();
             }
 
-            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA32F, GL_RGBA, textures[0].id, GL_COLOR_ATTACHMENT0);
-            graphicsBuffer.getData(width, height, GL_FLOAT, GL_RGBA32F, GL_RGBA, textures[1].id, GL_COLOR_ATTACHMENT1);
-            graphicsBuffer.getData(width, height, GL_UNSIGNED_BYTE, GL_RGBA8, GL_RGBA, textures[2].id, GL_COLOR_ATTACHMENT2);
+            geometryDataBuffer.getData(width, height, GL_FLOAT, GL_RGBA32F, GL_RGBA, textures[0].id, GL_COLOR_ATTACHMENT0);
+            geometryDataBuffer.getData(width, height, GL_FLOAT, GL_RGBA32F, GL_RGBA, textures[1].id, GL_COLOR_ATTACHMENT1);
+            geometryDataBuffer.getData(width, height, GL_UNSIGNED_BYTE, GL_RGBA8, GL_RGBA, textures[2].id, GL_COLOR_ATTACHMENT2);
 
             unsigned int attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
             glDrawBuffers(USED_TEXTURES, attachments);
@@ -491,19 +495,19 @@ namespace potent {
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer.id);
 
-            graphicsBuffer.unbind();
+            geometryDataBuffer.unbind();
         }
 
-        void startGraphicsBuffer() {
-            graphicsBuffer.bind();
+        void beginGeometryBuffer() {
+            geometryDataBuffer.bind();
         }
 
-        void endGraphicsBuffer() {
-            graphicsBuffer.unbind();
+        void endGeometryBuffer() {
+            geometryDataBuffer.unbind();
         }
 
         void copyDepthToAnotherFramebuffer(int sourceWidth, int sourceHeight, int destinationWidth, int destinationHeight, int anotherFramebuffer = 0) {
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, graphicsBuffer.id);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, geometryDataBuffer.id);
             glBindFramebuffer(GL_DRAW_BUFFER, anotherFramebuffer);
 
             glBlitFramebuffer(0, 0, sourceWidth, sourceHeight, 0, 0, destinationWidth, destinationHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);

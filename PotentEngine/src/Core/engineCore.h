@@ -27,8 +27,9 @@ namespace potent {
 
 	const char* DEBUG_DRAW_FRAGMNET_SHADER =
 		"#version 450 core\n"
+		"uniform vec4 uColor;\n"
 		"out vec4 oCol;\n"
-		"void main() {\noCol = vec4(0.0, 1.0, 0.0, 1.0);\ngl_FragDepth = 0.0;\n}\n";
+		"void main() {\noCol = uColor;\n}\n";
 
 	std::vector<std::uint8_t> loadImageData(std::string path, std::uint32_t* pWidth, std::uint32_t* pHeight, std::uint32_t* pColorChannels = nullptr) {
 		int width, height, nrChann;

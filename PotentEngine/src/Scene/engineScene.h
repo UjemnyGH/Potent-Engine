@@ -87,70 +87,12 @@ namespace potent {
 
 	class SceneHandler {
 	private:
-		const MeshRawData SQUARE_MESH = {
-			{
-				 1.0f,  1.0f, 0.0f,
-				-1.0f,  1.0f, 0.0f,
-				 1.0f, -1.0f, 0.0f,
-
-				-1.0f,  1.0f, 0.0f,
-				 1.0f, -1.0f, 0.0f,
-				-1.0f, -1.0f, 0.0f
-			},
-			{
-				0.0f, 0.0f, -1.0f,
-				0.0f, 0.0f, -1.0f,
-				0.0f, 0.0f, -1.0f,
-				0.0f, 0.0f, -1.0f,
-				0.0f, 0.0f, -1.0f,
-				0.0f, 0.0f, -1.0f
-			},
-			{
-				1.0f, 1.0f,
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-
-				0.0f, 1.0f,
-				1.0f, 0.0f,
-				0.0f, 0.0f,
-			}
-		};
-
-		GeometryBuffer mSceneGeometryBuffer;
-		RenderObjectData mSquareData;
-		RenderData mSquareRender;
-		Renderer mRenderer;
-		std::array<Texture, 32> mPostProcessingTextures;
-		bool mFirstTimeInitialization = true;
-
 		std::vector<Scene*> mScenePtrs;
 		Scene* mCurrentScene;
 		bool mAwakeCalled = false;
 		bool mStartCalled = false;
 
 	public:
-		bool postProcessLightRendering = true;
-
-		SceneHandler() {
-			mSquareData.name = "POST_PROCESS_SQUARE";
-			mSquareData.makeModel(SQUARE_MESH);
-
-			mSquareRender.name = "POST_PROCESS_RENDERING";
-			mSquareRender.meshData.push_back(&mSquareData);
-
-			mSquareRender.joinData();
-		}
-
-		void reinitializeSceneRenderer() {
-			mFirstTimeInitialization = true;
-		}
-
-		Texture* getPostProcessingTexturePointer(int index) { return &mPostProcessingTextures[index]; }
-		Renderer* getPostProcessingRendererPointer() { return &mRenderer; }
-		RenderData* getPostProcessingSquareRenderDataPointer() { return &mSquareRender; }
-
-		GeometryBuffer* getGeometryBufferPointer() { return &mSceneGeometryBuffer; }
-
 		void attachScene(Scene* pScene) {
 			mScenePtrs.push_back(pScene);
 		}
@@ -221,60 +163,10 @@ namespace potent {
 			mStartCalled = true;
 		}
 
-		void updateCurrent(int width, int height, Shader* pPostProcessLightVertexShader, Shader* pPostProcessLightFragmentShader) {
-			if (!pPostProcessLightFragmentShader || !pPostProcessLightVertexShader) {
-				ENGINE_ERROR("Cannot load post processing shaders, exiting update loop immediately!");
-			
-				return;
-			}
-			
+		void updateCurrent() {
 			if (mCurrentScene == nullptr) return;
 
-			if (postProcessLightRendering) {
-
-				mRenderer()->use();
-
-				if (mRenderer()->linked) {
-					glUniform4f(glGetUniformLocation(mRenderer()->id, "uViewPosition"), 0.0f, 0.0f, 0.0f, 0.0f);
-				}
-
-				mRenderer()->unuse();
-
-				mSceneGeometryBuffer.initGraphicsBuffer(width, height);
-				mSceneGeometryBuffer.startGraphicsBuffer();
-			}
-
-			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-			glClear(0x4100);
-
 			mCurrentScene->update();
-
-			if (postProcessLightRendering) {
-				mSceneGeometryBuffer.endGraphicsBuffer();
-
-				if (mFirstTimeInitialization) {
-					mRenderer.attachShader(pPostProcessLightVertexShader);
-					mRenderer.attachShader(pPostProcessLightFragmentShader);
-					mRenderer.relinkShaderProgram();
-
-					mRenderer.useMaxTexture();
-
-					mSquareRender.bindData();
-				
-					mFirstTimeInitialization = false;
-				}
-
-				mPostProcessingTextures[0].name = "GBUFFER_POSITION_TEXTURE";
-				mPostProcessingTextures[1].name = "GBUFFER_NORMAL_TEXTURE";
-				mPostProcessingTextures[2].name = "GBUFFER_DIFFUSE_SPECULAR_TEXTURE";
-
-				for (std::uint32_t i = 0; i < mSceneGeometryBuffer.USED_TEXTURES; i++) {
-					mPostProcessingTextures[i].textureBuffer = mSceneGeometryBuffer.textures[i];
-					mSquareRender.texturesPtr[i] = &mPostProcessingTextures[i];
-				}
-
-				mRenderer.render(&mSquareRender, RMat::Identity(), RMat::Identity());
-			}
 		}
 
 		void lateUpdateCurrent() {

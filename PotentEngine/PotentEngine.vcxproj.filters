@@ -22,6 +22,7 @@
     <ClInclude Include="src\Script\engineMonoCore.h" />
     <ClInclude Include="src\UI\engineUICore.h" />
     <ClInclude Include="src\UI\engineUIDebugText.h" />
+    <ClInclude Include="src\Core\engineRuntimeInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\run.cpp" />
@@ -32,5 +33,6 @@
     <None Include="assets\shaders\texture.frag" />
     <None Include="assets\shaders\post_light.vert" />
     <None Include="assets\shaders\post_light.frag" />
+    <None Include="assets\shaders\texture.geom" />
   </ItemGroup>
 </Project>

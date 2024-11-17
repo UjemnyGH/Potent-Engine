@@ -155,6 +155,4 @@ void main() {
 	}
 	// / float(uMaxDirectionalLights + uMaxPointLights + uMaxSpotLights)
 	oColor = vec4(pow(result, vec3(gamma)), 1.0);
-
-	gl_FragDepth = 0.5;
 }

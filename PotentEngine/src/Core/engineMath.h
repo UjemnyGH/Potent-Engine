@@ -112,6 +112,8 @@ namespace potent {
         inline bool operator<(Vector<T> v) { return x < v.x || y < v.y || z < v.z; }
         inline bool operator<=(Vector<T> v) { return x <= v.x || y <= v.y || z <= v.z; }
 
+        inline std::string str() { return std::string("X: " + std::to_string(x) + " Y: " + std::to_string(y) + " Z: " + std::to_string(z) + " W: " + std::to_string(w)); }
+
         /**
          * @brief Scalar (dot) product of vector
          *
@@ -359,6 +361,13 @@ namespace potent {
 
         Matrix4<T>() { Fill(static_cast<T>(0)); }
         Matrix4<T>(T v) { Fill(v); }
+
+        inline std::string str() { 
+            return std::string(std::to_string(m[0]) + ", " + std::to_string(m[1]) + ", " + std::to_string(m[2]) + ", " + std::to_string(m[3]) + "\n"
+            + std::to_string(m[4]) + ", " + std::to_string(m[5]) + ", " + std::to_string(m[6]) + ", " + std::to_string(m[7]) + "\n"
+            + std::to_string(m[8]) + ", " + std::to_string(m[9]) + ", " + std::to_string(m[10]) + ", " + std::to_string(m[11]) + "\n"
+            + std::to_string(m[12]) + ", " + std::to_string(m[13]) + ", " + std::to_string(m[14]) + ", " + std::to_string(m[15])); 
+        }
 
         template<typename TN>
         Matrix4<T>(Matrix4<TN> v) { 

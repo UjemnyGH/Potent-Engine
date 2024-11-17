@@ -23,6 +23,7 @@
     <ClInclude Include="src\Core\engineCore.h" />
     <ClInclude Include="src\Core\engineFileSystem.h" />
     <ClInclude Include="src\Core\engineMath.h" />
+    <ClInclude Include="src\Core\engineRuntimeInfo.h" />
     <ClInclude Include="src\Core\engineWindow.h" />
     <ClInclude Include="src\Physics\engineCollisions.h" />
     <ClInclude Include="src\Physics\engineParticle.h" />
@@ -49,6 +50,7 @@
     <None Include="assets\shaders\post_light.frag" />
     <None Include="assets\shaders\post_light.vert" />
     <None Include="assets\shaders\texture.frag" />
+    <None Include="assets\shaders\texture.geom" />
     <None Include="assets\shaders\texture.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -5,9 +5,13 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include "engineCore.h"
+#include <chrono>
 
 namespace potent {
 	void openGlDebugMessageCallback(std::uint32_t source, std::uint32_t type, std::uint32_t id, std::uint32_t severity, std::int32_t length, const char* message, const void* userParam) {
+		// GL_INVALID_FRAMEBUFFER_OPERATION error skip (shows on minimized window)
+		if (type == 0x824c && severity == 0x9146) return;
+		
 		if (type == GL_DEBUG_TYPE_ERROR) {
 			ENGINE_GL_ERROR("Type: 0x" << std::hex << type << ", Severity: 0x" << severity << " > " << message << std::dec);
 		}
@@ -23,8 +27,28 @@ namespace potent {
 	public:
 		static Window* instance;
 		static double mouseX, mouseY;
+		static double scrollX, scrollY;
 		static int windowWidth, windowHeight;
 		static double engineTime, engineDeltaTime, engineLastTime, engineFixedDeltaTime;
+		static bool windowRunning;
+
+		static void windowSizeCallback(GLFWwindow* wnd, int width, int height) {
+			(void)wnd;
+			Window::windowWidth = width;
+			Window::windowHeight = height;
+		}
+
+		static void windowMouseCallback(GLFWwindow* wnd, double posx, double posy) {
+			(void)wnd;
+			Window::mouseX = posx;
+			Window::mouseY = posy;
+		}
+
+		static void windowScrollCallback(GLFWwindow* wnd, double posx, double posy) {
+			(void)wnd;
+			Window::scrollX = posx;
+			Window::scrollY = posy;
+		}
 
 		virtual void awake() {}
 		virtual void start() {}
@@ -83,25 +107,22 @@ namespace potent {
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glfwSetWindowSizeCallback(mWindowPtr, Window::windowSizeCallback);
+			glfwSetCursorPosCallback(mWindowPtr, Window::windowMouseCallback);
+			glfwSetScrollCallback(mWindowPtr, Window::windowScrollCallback);
+			Window::windowSizeCallback(mWindowPtr, width, height);
 
 			glfwSwapInterval(1);
 
 			start();
 
-			while (!glfwWindowShouldClose(mWindowPtr)) {
+			while ((Window::windowRunning = !glfwWindowShouldClose(mWindowPtr))) {
 				engineTime = glfwGetTime();
 				engineDeltaTime = engineTime - engineLastTime;
 				engineLastTime = engineTime;
 
-				glfwGetCursorPos(mWindowPtr, &mouseX, &mouseY);
-				glfwGetWindowSize(mWindowPtr, &windowWidth, &windowHeight);
-
-				glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-				glClear(0x4100);
-
 				update();
-				
+
 				glfwSwapBuffers(mWindowPtr);
 
 				lateUpdate();
@@ -118,6 +139,9 @@ namespace potent {
 	double Window::mouseX = 0.0;
 	double Window::mouseY = 0.0;
 
+	double Window::scrollX = 0.0;
+	double Window::scrollY = 0.0;
+
 	int Window::windowWidth = 0;
 	int Window::windowHeight = 0;
 
@@ -125,6 +149,8 @@ namespace potent {
 	double Window::engineDeltaTime = 0.0;
 	double Window::engineLastTime = 0.0;
 	double Window::engineFixedDeltaTime = 0.0;
+
+	bool Window::windowRunning = true;
 }
 
 #endif

@@ -10,26 +10,28 @@ layout(location = 2) in vec2 iTexC;
 layout(location = 3) in vec4 iCol;
 layout(location = 4) in float iTexId;
 
-out vec4 vCol;
-out vec2 vTexC;
-out float vTexId;
-out vec3 vNor;
-out vec4 vPos;
+out VS_OUT {
+	vec4 vCol;
+	vec2 vTexC;
+	float vTexId;
+	vec3 vNor;
+	vec4 vPos;
 
-out mat4 vProjection;
-out mat4 vView;
-out mat4 vTransform;
+	mat4 vProjection;
+	mat4 vView;
+	mat4 vTransform;
+} vs_out;
 
 void main() {
-	vCol = iCol;
-	vTexC = iTexC;
-	vTexId = iTexId;
-	vNor = transpose(inverse(mat3(uTransform))) * iNor;
-	vPos = uTransform * vec4(iPos.xyz, 1.0);
+	vs_out.vCol = iCol;
+	vs_out.vTexC = iTexC;
+	vs_out.vTexId = iTexId;
+	vs_out.vNor = transpose(inverse(mat3(uTransform))) * iNor;
+	vs_out.vPos = uTransform * vec4(iPos.xyz, 1.0);
 
-	vProjection = uProjection;
-	vView = uView;
-	vTransform = uTransform;
+	vs_out.vProjection = uProjection;
+	vs_out.vView = uView;
+	vs_out.vTransform = uTransform;
 
 	gl_Position = uProjection * uView * uTransform * iPos;
 }
